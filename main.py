@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+import hashlib
 
 app = FastAPI()
 
@@ -25,3 +26,11 @@ def method():
 @app.options("/method")
 def method():
     return{"method": "OPTIONS"}
+
+@app.get("/auth", status_code=204)
+def auth(password: str = "", password_hash: str = ""):
+    pwdhash = hashlib.sha512(password.encode())
+    if len(password) > 0 and len(password_hash) > 0 and pwdhash.hexdigest() == password_hash:
+        return
+    else:
+        raise HTTPException(status_code=401)
