@@ -6,7 +6,7 @@ app = FastAPI()
 def root():
     return {"message": "Hello world!"}
 
-@app.post("/method")
+@app.post("/method", status_code=201)
 def method():
     return{"method": "POST"}
 
