@@ -21,3 +21,7 @@ def method():
 @app.delete("/method")
 def method():
     return{"method": "DELETE"}
+
+@app.options("/method")
+def method():
+    return{"method": "OPTIONS"}
