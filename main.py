@@ -52,9 +52,9 @@ class RegisterResponse(BaseModel):
     vaccination_date: date
 
 @app.post("/register", status_code=201, response_model=RegisterResponse)
-def register(item: RegisterRequest,date: Optional[datetime.date] = Header(None),):
+def register(item: RegisterRequest,date: Optional[datetime.datetime] = Header(None),):
     app.counter += 1
-    current_date = date if isinstance(date,datetime.date) else datetime.date.today()
+    current_date = datetime.date.today() if not isinstance(date,datetime.datetime) else date.date() 
     return RegisterResponse(id = app.counter, 
             name = item.name,
             surname = item.surname,
