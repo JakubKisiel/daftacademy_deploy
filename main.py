@@ -1,7 +1,9 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 import hashlib
 from pydantic import BaseModel
+import datetime
 from datetime import date, timedelta
+from typing import Optional
 
 app = FastAPI()
 app.counter = 0 
@@ -50,12 +52,13 @@ class RegisterResponse(BaseModel):
     vaccination_date: date
 
 @app.post("/register", status_code=201, response_model=RegisterResponse)
-def register(item: RegisterRequest):
+def register(item: RegisterRequest,date: Optional[datetime.date] = Header(None),):
     app.counter += 1
+    current_date = date if isinstance(date,datetime.date) else datetime.date.today()
     return RegisterResponse(id = app.counter, 
             name = item.name,
             surname = item.surname,
-            register_date = date.today(),
-            vaccination_date = (date.today() + timedelta(days = len(item.name)+ len(item.surname)))
+            register_date = current_date,
+            vaccination_date = (current_date + timedelta(days = len(item.name)+ len(item.surname)))
             )
     
