@@ -55,10 +55,15 @@ class RegisterResponse(BaseModel):
 def register(item: RegisterRequest,date: Optional[datetime.datetime] = Header(None),):
     app.counter += 1
     current_date = datetime.date.today() if not isinstance(date,datetime.datetime) else date.date() 
+    count_letters = 0
+    for i in item.name:
+        count_letters += 1 if i.isalpha() else 0
+    for i in item.surname:
+        count_letters += 1 if i.isalpha() else 0
     return RegisterResponse(id = app.counter, 
             name = item.name,
             surname = item.surname,
             register_date = current_date,
-            vaccination_date = (current_date + timedelta(days = len(item.name.strip())+ len(item.surname.strip())))
+            vaccination_date = (current_date + timedelta(count_letters))
             )
     
