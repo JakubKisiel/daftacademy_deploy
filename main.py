@@ -59,6 +59,6 @@ def register(item: RegisterRequest,date: Optional[datetime.datetime] = Header(No
             name = item.name,
             surname = item.surname,
             register_date = current_date,
-            vaccination_date = (current_date + timedelta(days = len(item.name)+ len(item.surname)))
+            vaccination_date = (current_date + timedelta(days = len(item.name.strip())+ len(item.surname.strip())))
             )
     
