@@ -77,5 +77,5 @@ def patient(id: int):
         raise HTTPException(status_code=404)
     if id < 1:
         raise HTTPException(status_code=400)
-    return app.tab[id]
+    return app.tab[id-1]
 
