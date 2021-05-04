@@ -135,4 +135,4 @@ def welcome_session(token: Optional[str] = "", format: Optional[str] = "plain"):
         return JSONResponse(content={"message": "Welcome!"})
     if format.lower() == "html":
         return HTMLResponse(content="<h1>Welcome!</h1>")
-    return Response(content="Welcome!")
+    return Response(content="Welcome!", media_type="plain")
