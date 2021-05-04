@@ -5,7 +5,8 @@ import hashlib
 from pydantic import BaseModel
 import datetime
 from datetime import date, timedelta
-from typing import Optional, Dict, Set
+from typing import Optional, Dict, Set, Deque
+from collections import deque
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
@@ -86,7 +87,7 @@ def patient(id: int):
         raise HTTPException(status_code=400)
     return app.tab[id-1]
   
-app.access_tokens: Set[str] = set()
+app.access_tokens: Deque[str] = deque()
 
 @app.get("/hello", response_class=HTMLResponse)
 def hello():
@@ -99,11 +100,13 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
     if not (correct_password and correct_username):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
-    app.access_tokens.add(session_token)
+    if len(app.access_tokens) == 3:
+        app.access_tokens.popleft()
+    app.access_tokens.append(session_token)
     response.set_cookie(key="session_token", value=session_token)
     return "Hello"
     
-app.token: Set[str] = set() 
+app.token: Deque[str] = deque() 
 
 @app.post("/login_token", status_code=201)
 def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
@@ -112,7 +115,9 @@ def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(
     if not (correct_password and correct_username):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
-    app.token.add(session_token)
+    if len(app.token) == 3:
+        app.token.popleft()
+    app.token.append(session_token)
     response.set_cookie(key="session_token", value=session_token)
     return {"token": session_token}
 
