@@ -1,14 +1,19 @@
-from fastapi import FastAPI, HTTPException, Header 
+from fastapi import FastAPI, HTTPException, Header , Depends, Response, Cookie, status
+import random
+import secrets
 import hashlib
 from pydantic import BaseModel
 import datetime
 from datetime import date, timedelta
-from typing import Optional
-
+from typing import Optional, Dict
 from starlette.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 app = FastAPI()
 app.counter = 0 
+LOGIN = "4dm1n"
+PASSWORD = "NotSoSecurePa$$"
+security = HTTPBasic()
 
 @app.get("/")
 def root():
@@ -81,8 +86,31 @@ def patient(id: int):
         raise HTTPException(status_code=400)
     return app.tab[id-1]
   
+app.access_tokens: Dict[str, str] = {}
 
 @app.get("/hello", response_class=HTMLResponse)
 def hello():
     return f"<h1>Hello! Today date is {datetime.date.today()}</h1>"
 
+@app.post("/login_session", status_code=201)
+def login_session(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, LOGIN)
+    correct_password = secrets.compare_digest(credentials.password, PASSWORD)
+    if not (correct_password and correct_username):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
+    app.access_tokens[credentials.username] = session_token
+    response.set_cookie(key="session_token", value=session_token)
+    return "Hello"
+    
+
+@app.post("/login_token")
+def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, LOGIN)
+    correct_password = secrets.compare_digest(credentials.password, PASSWORD)
+    if not (correct_password and correct_username):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
+    app.access_tokens[credentials.username] = session_token
+    response.set_cookie(key="session_token", value=session_token)
+    return {"token": session_token}
