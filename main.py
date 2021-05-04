@@ -6,7 +6,7 @@ from pydantic import BaseModel
 import datetime
 from datetime import date, timedelta
 from typing import Optional, Dict, Set
-from starlette.responses import HTMLResponse, JSONResponse
+from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 app = FastAPI()
@@ -142,3 +142,30 @@ def welcome_session(response: Response,token: Optional[str] = "", format: Option
         return HTMLResponse(content="<h1>Welcome!</h1>")
     response.headers["content-type"] = "text/plain"
     return Response(content="Welcome!", media_type="text/plain")
+
+@app.delete("/logout_session")
+def delete_session(response: Response, session_token: Optional[str] = Cookie(None), format: Optional[str] = "plain"):
+    if  session_token not in app.access_tokens:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    app.access_tokens.remove(session_token)
+    return RedirectResponse(url=f"/logged_out?format={format}", status_code=302)
+
+@app.delete("/logout_token")
+def logout_token(response: Response,token: Optional[str] = "", format: Optional[str] = "plain"):
+    if  token not in app.token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    app.token.remove(token)
+    return RedirectResponse(url=f"/logged_out?format={format}", status_code=302)
+
+@app.get("/logged_out")
+def logged_out(response: Response, format: Optional[str] = "plain"):
+    if format.lower() == "json":
+        response.headers["content-type"] = "application/json"
+        return JSONResponse(content={"message": "Logged out!"})
+    if format.lower() == "text/html":
+        response.headers["content-type"] = "html"
+        return HTMLResponse(content="<h1>Logged out!</h1>")
+    response.headers["content-type"] = "text/plain"
+    return Response(content="Logged out!", media_type="text/plain")
+
+
