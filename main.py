@@ -99,7 +99,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
     if not (correct_password and correct_username):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
-    app.access_tokens = session_token
+    app.access_tokens = session_token.lower()
     response.set_cookie(key="session_token", value=session_token)
     return "Hello"
     
@@ -112,13 +112,13 @@ def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(
     if not (correct_password and correct_username):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
-    app.token = session_token
+    app.token = session_token.lower()
     response.set_cookie(key="session_token", value=session_token)
     return {"token": session_token}
 
 @app.get("/welcome_session")
 def welcome_session(session_token: Optional[str] = Cookie(None), format: Optional[str] = "plain"):
-    if app.access_tokens != session_token:
+    if app.access_tokens != session_token.lower():
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     if format.lower() == "json":
         return JSONResponse(content={"message": "Welcome!"})
@@ -129,7 +129,7 @@ def welcome_session(session_token: Optional[str] = Cookie(None), format: Optiona
 
 @app.get("/welcome_token")
 def welcome_session(token: Optional[str] = "", format: Optional[str] = "plain"):
-    if app.token != token:
+    if app.token != token.lower():
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     if format.lower() == "json":
         return JSONResponse(content={"message": "Welcome!"})
