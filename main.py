@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header 
 import hashlib
 from pydantic import BaseModel
 import datetime
 from datetime import date, timedelta
 from typing import Optional
+
+from starlette.responses import HTMLResponse
 
 app = FastAPI()
 app.counter = 0 
@@ -78,4 +80,9 @@ def patient(id: int):
     if id < 1:
         raise HTTPException(status_code=400)
     return app.tab[id-1]
+  
+
+@app.get("/hello", response_class=HTMLResponse)
+def hello():
+    return f"<h1>Hello! Today date is {datetime.date.today()}</h1>"
 
