@@ -104,7 +104,7 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
     return "Hello"
     
 
-@app.post("/login_token")
+@app.post("/login_token", status_code=201)
 def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, LOGIN)
     correct_password = secrets.compare_digest(credentials.password, PASSWORD)
