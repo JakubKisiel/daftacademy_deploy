@@ -121,13 +121,13 @@ def welcome_session(response: Response, session_token: Optional[str] = Cookie(No
     if session_token not in app.access_tokens:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     if format.lower() == "json":
-        response.headers["content-type"] = "json"
+        response.headers["content-type"] = "application/json"
         return JSONResponse(content={"message": "Welcome!"})
     if format.lower() == "html":
-        response.headers["content-type"] = "html"
+        response.headers["content-type"] = "text/html"
         return HTMLResponse(content="<h1>Welcome!</h1>")
-    response.headers["content-type"] = "plain"
-    return Response(content="Welcome!", media_type="plain")
+    response.headers["content-type"] = "text/plain"
+    return Response(content="Welcome!", media_type="text/plain")
 
 
 @app.get("/welcome_token")
@@ -135,10 +135,10 @@ def welcome_session(response: Response,token: Optional[str] = "", format: Option
     if token not in app.token :
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     if format.lower() == "json":
-        response.headers["content-type"] = "json"
+        response.headers["content-type"] = "application/json"
         return JSONResponse(content={"message": "Welcome!"})
-    if format.lower() == "html":
+    if format.lower() == "text/html":
         response.headers["content-type"] = "html"
         return HTMLResponse(content="<h1>Welcome!</h1>")
-    response.headers["content-type"] = "plain"
-    return Response(content="Welcome!", media_type="plain")
+    response.headers["content-type"] = "text/plain"
+    return Response(content="Welcome!", media_type="text/plain")
