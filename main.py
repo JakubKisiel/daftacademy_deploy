@@ -5,7 +5,7 @@ import hashlib
 from pydantic import BaseModel
 import datetime
 from datetime import date, timedelta
-from typing import Optional, Dict
+from typing import Optional, Dict, Set
 from starlette.responses import HTMLResponse, JSONResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
@@ -86,7 +86,7 @@ def patient(id: int):
         raise HTTPException(status_code=400)
     return app.tab[id-1]
   
-app.access_tokens: str = "fhdsahdaskljghjldash"
+app.access_tokens: Set[str] = set()
 
 @app.get("/hello", response_class=HTMLResponse)
 def hello():
@@ -99,11 +99,11 @@ def login_session(response: Response, credentials: HTTPBasicCredentials = Depend
     if not (correct_password and correct_username):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
-    app.access_tokens = session_token
+    app.access_tokens.add(session_token)
     response.set_cookie(key="session_token", value=session_token)
     return "Hello"
     
-app.token: str = "fdshjfdhsakjhfdag"
+app.token: Set[str] = set() 
 
 @app.post("/login_token", status_code=201)
 def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
@@ -112,13 +112,13 @@ def login_token(response: Response, credentials: HTTPBasicCredentials = Depends(
     if not (correct_password and correct_username):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_token = hashlib.sha256(f"{credentials.username}{credentials.password}{random.random()}".encode()).hexdigest()
-    app.token = session_token
+    app.token.add(session_token)
     response.set_cookie(key="session_token", value=session_token)
     return {"token": session_token}
 
 @app.get("/welcome_session")
 def welcome_session(session_token: Optional[str] = Cookie(None), format: Optional[str] = "plain"):
-    if app.access_tokens != session_token:
+    if session_token in app.access_tokens:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     if format.lower() == "json":
         return JSONResponse(content={"message": "Welcome!"})
@@ -129,7 +129,7 @@ def welcome_session(session_token: Optional[str] = Cookie(None), format: Optiona
 
 @app.get("/welcome_token")
 def welcome_session(token: Optional[str] = "", format: Optional[str] = "plain"):
-    if app.token != token:
+    if token in app.token :
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     if format.lower() == "json":
         return JSONResponse(content={"message": "Welcome!"})
