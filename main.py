@@ -124,7 +124,7 @@ def welcome_session(session_token: Optional[str] = Cookie(None), format: Optiona
         return JSONResponse(content={"message": "Welcome!"})
     if format.lower() == "html":
         return HTMLResponse(content="<h1>Welcome!</h1>")
-    return Response(content="Welcome!")
+    return Response(content="Welcome!", media_type="plain")
 
 
 @app.get("/welcome_token")
