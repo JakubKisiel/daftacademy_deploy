@@ -61,6 +61,20 @@ async def employees(limit: int = 0, offset: int = 0, order: str = None):
     data = await data.fetchall()
     return {"employees": data}
     
+@zad4.get("/products_extended")
+async def products_extended():
+    zad4.db_connection.row_factory = aiosqlite.Row
+    data = await zad4.db_connection.execute(f"""
+    SELECT Products.ProductID id, Products.ProductName name, 
+    Categories.CategoryName category, Suppliers.CompanyName supplier
+    FROM Products
+    LEFT JOIN Categories on Products.CategoryID = Categories.CategoryID
+    LEFT JOIN Suppliers on Products.SupplierID = Suppliers.SupplierID
+    ORDER BY id
+    """)
+    data = await data.fetchall()
+    return {"products_extended": data}
+
 
 
 
