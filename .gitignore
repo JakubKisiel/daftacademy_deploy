@@ -2,3 +2,4 @@ tests.py
 daft
 __pycache__
 .pytest_cache
+check.py
