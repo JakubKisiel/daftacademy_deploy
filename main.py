@@ -9,7 +9,7 @@ from typing import Optional, Dict, Set, Deque, List
 from collections import deque
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from views.zad4 import zad4
+from routers.zad4 import zad4
 
 app = FastAPI()
 app.include_router(zad4, tags=["zad4"])

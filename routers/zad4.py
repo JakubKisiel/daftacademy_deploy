@@ -58,6 +58,7 @@ async def employees(limit: int = 0, offset: int= 0, order: str = None):
     LIMIT ?
     OFFSET ?
     """, (order, limit, offset))
+    data = await data.fetchall()
     return {"employees": data}
     
 
