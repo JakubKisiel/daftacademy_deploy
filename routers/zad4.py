@@ -113,20 +113,20 @@ async def post_category(category: CategoryGet):
     cursor = await zad4.db_connection.cursor()
     await cursor.execute("INSERT INTO Categories (CategoryName) VALUES (?);", (category.name,))
     category_added = Category(name=category.name, id=cursor.lastrowid)
-    zad4.db_connection.commit()
+    await zad4.db_connection.commit()
     return category_added
 
 
 @zad4.put("/categories/{id}", response_model=Category)
 async def put_category(id: int, category: CategoryGet):
     cursor = await zad4.db_connection.cursor()
-    data = await cursor.execute(f"SELECT CategoryID FROM Categories where CategoryId = {id}")
-    data = await data.fetchone()
+    await cursor.execute(f"SELECT CategoryID FROM Categories where CategoryId = {id}")
+    data = await cursor.fetchone()
     if not data:
         raise HTTPException(status_code=404, detail="Id not found")
     await cursor.execute(
             f"UPDATE Categories SET CategoryName = {category.name} WHERE CategoryID = {id}"
-                   )
+    )
     category_added = Category(name=category.name, id=id)
     await zad4.db_connection.commit()
     return category_added
