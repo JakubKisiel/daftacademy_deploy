@@ -46,18 +46,18 @@ async def products_id(id: int):
 EMP_SET = {"order", "first_name", "last_name", "city"}
 
 @zad4.get("/employees")
-async def employees(limit: int = 0, offset: int= 0, order: str = None):
-    if order and order not in EMP_SET:
+async def employees(limit: int = 0, offset: int = 0, order: str = None):
+    if order and (order not in EMP_SET):
         raise HTTPException(status_code=400)
     order = order if order else "id"
     zad4.db_connection.row_factory = aiosqlite.Row
-    data = await zad4.db_connection.execute("""
+    data = await zad4.db_connection.execute(f"""
     SELECT EmployeeID id, LastName last_name, FirstName first_name, City city
     FROM Employees
-    ORDER BY ?
-    LIMIT ?
-    OFFSET ?
-    """, (order, limit, offset))
+    ORDER BY {order}
+    LIMIT {limit}
+    OFFSET {offset}
+    """)
     data = await data.fetchall()
     return {"employees": data}
     
