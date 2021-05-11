@@ -88,7 +88,7 @@ async def products_extended(id: int):
         raise HTTPException(status_code=404)
     data = await zad4.db_connection.execute(f"""
     SELECT Orders.OrderId id, Customers.CompanyName customer,
-    OrderDetails.Quantity, ROUND(OrderDetails.Quantity * OrderDetails.UnitPrice -
+    OrderDetails.Quantity quantity, ROUND(OrderDetails.Quantity * OrderDetails.UnitPrice -
     (OrderDetails.Discount * (OrderDetails.UnitPrice * OrderDetails.Quantity)), 2)
     total_price
     FROM Orders
