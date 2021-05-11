@@ -76,5 +76,29 @@ async def products_extended():
     return {"products_extended": data}
 
 
+@zad4.get("/products/{id}/orders")
+async def products_extended(id: int):
+    zad4.db_connection.row_factory = aiosqlite.Row
+    product = await zad4.db_connection.execute(f"""
+            SELECT ProductId FROM Products
+            WHERE ProductId = {id}
+            """)
+    product = await product.fetchone()
+    if not product:
+        raise HTTPException(status_code=404)
+    data = await zad4.db_connection.execute(f"""
+    SELECT Orders.OrderId id, Customers.CompanyName customer,
+    OrderDetails.Quantity, ROUND(OrderDetails.Quantity * OrderDetails.UnitPrice -
+    (OrderDetails.Discount * (OrderDetails.UnitPrice * OrderDetails.Quantity)), 2)
+    total_price
+    FROM Orders
+    INNER JOIN 'Order Details' OrderDetails on Orders.OrderId = OrderDetails.OrderId
+    INNER JOIN Products on OrderDetails.ProductId = Products.ProductId
+    INNER JOIN Customers on Orders.CustomerId = Customers.CustomerId
+    WHERE OrderDetails.ProductId = {id}
+    ORDER BY Orders.OrderId
+    """)
+    data = await data.fetchall()
+    return {"orders": data}
 
 
