@@ -110,8 +110,8 @@ class Category(BaseModel):
 
 @zad4.post("/categories", status_code=201, response_model=Category)
 async def post_category(category: CategoryGet):
-    cursor = zad4.db_connection.cursor()
-    cursor.execute("INSERT INTO Categories (CategoryName) VALUES (?);", (category.name,))
+    cursor = await zad4.db_connection.cursor()
+    await cursor.execute("INSERT INTO Categories (CategoryName) VALUES (?);", (category.name,))
     category_added = Category(name=category.name, id=cursor.lastrowid)
     zad4.db_connection.commit()
     return category_added
