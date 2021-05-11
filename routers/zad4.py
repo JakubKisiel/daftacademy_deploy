@@ -137,4 +137,4 @@ async def delete_category(id: int):
     if cursor.rowcount <= 0:
         raise HTTPException(status_code=404, detail="Id not found")
     await zad4.db_connection.commit()
-    return {"deleted":data.rowcount}
+    return {"deleted":cursor.rowcount}
