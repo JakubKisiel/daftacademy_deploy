@@ -195,6 +195,6 @@ async def categories():
     cursor = await app.db_connection.execute("SELECT * FROM Customers")
     data = await cursor.fetchall()
     data.sort(key= lambda tup: tup[0].upper())
-    return {"categories":[{"id": tup[0], "name": tup[1], "full_address": f"{tup[2] if tup[2] else ''} {tup[3] if tup[3] else ''} {tup[4] if tup[4] else ''} {tup[5] if tup[5] else ''}"} for tup in data]}
+    return {"categories":[{"id": tup[0], "name": tup[1] if tup[1] else '', "full_address": f"{tup[2] if tup[2] else ''} {tup[3] if tup[3] else ''} {tup[4] if tup[4] else ''} {tup[5] if tup[5] else ''}"} for tup in data]}
 
 
