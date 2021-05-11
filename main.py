@@ -175,6 +175,3 @@ def logged_out(response: Response, format: Optional[str] = "plain"):
         return HTMLResponse(content="<h1>Logged out!</h1>")
     response.headers["content-type"] = "text/plain"
     return Response(content="Logged out!", media_type="text/plain")
-
-
-

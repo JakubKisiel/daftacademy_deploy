@@ -108,7 +108,6 @@ class Category(BaseModel):
     name: str
     id: int
 
-
 @zad4.post("/categories", status_code=201, response_model=Category)
 async def post_category(category: CategoryGet):
     cursor = await zad4.db_connection.cursor()
@@ -121,14 +120,12 @@ async def post_category(category: CategoryGet):
 @zad4.put("/categories/{id}", response_model=Category)
 async def put_category(id: int, category: CategoryGet):
     cursor = await zad4.db_connection.cursor()
-    await cursor.execute(f"SELECT CategoryID FROM Categories where CategoryId = {id}")
-    data = await cursor.fetchone()
-    if not data:
+    await cursor.execute("UPDATE Categories SET CategoryName = :cname WHERE CategoryID = :cid;"
+                   , dict(cname=category.name, cid=id))
+    print(f"{cursor.lastrowid = }")  # why cursor.lastrowid return 0??
+    if cursor.rowcount <= 0:
         raise HTTPException(status_code=404, detail="Id not found")
-    await cursor.execute(
-            f"UPDATE Categories SET CategoryName = {category.name} WHERE CategoryID = {id}"
-    )
-    category_added = Category(name=category.name, id=id)
+    category_added = Category(name=category.name, id=id)  # why cursor.lastrowid return 0??
     await zad4.db_connection.commit()
     return category_added
 
@@ -136,8 +133,8 @@ async def put_category(id: int, category: CategoryGet):
 @zad4.delete("/categories/{id}")
 async def delete_category(id: int):
     cursor = await zad4.db_connection.cursor()
-    await cursor.execute("DELETE FROM Categories WHERE CategoryID = ?", (id,))
+    await cursor.execute("DELETE FROM Categories WHERE CategoryID = ?;", (id,))
     if cursor.rowcount <= 0:
         raise HTTPException(status_code=404, detail="Id not found")
     await zad4.db_connection.commit()
-    return {"deleted":cursor.rowcount}
+    return dict(deleted=cursor.rowcount)
