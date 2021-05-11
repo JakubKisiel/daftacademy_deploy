@@ -192,8 +192,7 @@ async def categories():
 
 @app.get("/customers")
 async def categories():
-    cursor = await app.db_connection.execute("SELECT CustomerID, ContactName FROM Categories")
-    data = list()
+    cursor = await app.db_connection.execute("SELECT CustomerID, ContactName FROM Customers")
     data:List = await cursor.fetchall()
     data.sort(key = lambda tup: tup[0])
     return {"customers":[{"id": tup[0], "name": tup[1]} for tup in data]}
