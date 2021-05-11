@@ -3,28 +3,21 @@ import random
 import secrets
 import hashlib
 from pydantic import BaseModel
-import aiosqlite
 import datetime
 from datetime import date, timedelta
 from typing import Optional, Dict, Set, Deque, List
 from collections import deque
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from views.zad4 import zad4
 
 app = FastAPI()
+app.include_router(zad4, tags=["zad4"])
 app.counter = 0 
 LOGIN = "4dm1n"
 PASSWORD = "NotSoSecurePa$$"
 security = HTTPBasic()
 
-@app.on_event("startup")
-async def startup():
-    app.db_connection = await aiosqlite.connect("northwind.db")
-    app.db_connection.text_factory = lambda b:b.decode(errors="ignore")
-
-@app.on_event("shutdown")
-async def shutdown():
-    await app.db_connection.close()
 
 @app.get("/")
 def root():
@@ -183,23 +176,5 @@ def logged_out(response: Response, format: Optional[str] = "plain"):
     response.headers["content-type"] = "text/plain"
     return Response(content="Logged out!", media_type="text/plain")
 
-@app.get("/categories")
-async def categories():
-    cursor = await app.db_connection.execute("SELECT CategoryID, CategoryName FROM Categories")
-    data = await cursor.fetchall()
-    data.sort(key = lambda tup: tup[0])
-    return {"categories":[{"id": tup[0], "name": tup[1]} for tup in data]}
-
-@app.get("/customers")
-async def categories():
-    app.db_connection.row_factory = aiosqlite.Row
-    cursor = await app.db_connection.execute( """SELECT CustomerID id, COALESCE(CompanyName, '') name, 
-        COALESCE(Address, '') || ' ' || COALESCE(PostalCode, '') || ' ' || COALESCE(City, '') || ' ' || 
-        COALESCE(Country, '') full_address 
-        FROM Customers c ORDER BY UPPER(CustomerID);"""
-    )
-    data = await cursor.fetchall()
-    print(data)
-    return {"customers": data}
 
 
