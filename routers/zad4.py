@@ -1,5 +1,5 @@
 import aiosqlite
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BaseModel
 zad4 = APIRouter()
 
 @zad4.on_event("startup")
@@ -100,5 +100,39 @@ async def products_extended(id: int):
     """)
     data = await data.fetchall()
     return {"orders": data}
+class CategoryGet(BaseModel):
+    name : str
+
+class Category(BaseModel):
+    name: str
+    id: int
 
 
+@zad4.post("/categories", status_code=201, response_model=Category)
+async def post_category(category: CategoryGet):
+    cursor = zad4.db_connection.cursor()
+    cursor.execute("INSERT INTO Categories (CategoryName) VALUES (?);", (category.name,))
+    category_added = Category(name=category.name, id=cursor.lastrowid)
+    zad4.db_connection.commit()
+    return category_added
+
+
+@zad4.put("/categories/{id}", response_model=Category)
+async def put_category(id: int, category: CategoryGet):
+    data = await zad4.db_connection.execute(
+            f"UPDATE Categories SET CategoryName = :cname WHERE CategoryID = {id}"
+                   )
+    if data.rowcount <= 0:
+        raise HTTPException(status_code=404, detail="Id not found")
+    category_added = Category(name=category.name, id=id)
+    await zad4.db_connection.commit()
+    return category_added
+
+
+@zad4.delete("/categories/{id}")
+async def delete_category(id: int):
+    data = await zad4.db_connection.execute("DELETE FROM Categories WHERE CategoryID = ?;", (id,))
+    if data.rowcount <= 0:
+        raise HTTPException(status_code=404, detail="Id not found")
+    await zad4.db_connection.commit()
+    return {'deleted':data.rowcount}
