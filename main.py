@@ -192,10 +192,9 @@ async def categories():
 
 @app.get("/customers")
 async def categories():
-    app.db_connection.row_factory = aiosqlite.Row
     cursor = await app.db_connection.execute("SELECT * FROM Customers")
-    data:List = await cursor.fetchall()
-    print(data)
-    return data;
+    data = await cursor.fetchall()
+    data.sort(key= lambda tup: tup[0])
+    return {"categories":[{"id": tup[0], "name": tup[1], "full_address": f"{tup[2]} {tup[3]} {tup[4]} {tup[5]}"} for tup in data]}
 
 
