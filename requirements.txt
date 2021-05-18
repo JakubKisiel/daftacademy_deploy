@@ -28,6 +28,7 @@ orjson==3.5.1
 packaging==20.9
 pluggy==0.13.1
 promise==2.3
+psycopg2==2.8.6
 py==1.10.0
 pydantic==1.8.1
 pynvim==0.4.3
