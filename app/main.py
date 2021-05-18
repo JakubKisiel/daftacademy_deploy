@@ -9,10 +9,10 @@ from typing import Optional, Dict, Set, Deque, List
 from collections import deque
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from app.views.zad4 import zad4
+from app.views.zad5 import zad5
 
 app = FastAPI()
-app.include_router(zad4, tags=["zad4"])
+app.include_router(zad5, tags=["northwind"])
 app.counter = 0 
 LOGIN = "4dm1n"
 PASSWORD = "NotSoSecurePa$$"
