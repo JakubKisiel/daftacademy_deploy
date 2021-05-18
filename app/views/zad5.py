@@ -25,3 +25,8 @@ async def get_supplier_products(supplier_id: PositiveInt, db: Session = Depends(
     if db_products is None:
         raise HTTPException(status_code=404, detail="Supplier not found")
     return db_products
+
+@router.post("/suppliers", response_model=schemas.Supplier, status_code=201)
+async def create_supplier(new_supplier: schemas.NewSupplier, db: Session = Depends(get_db)):
+    db_new_supplier = crud.create_new_supplier(db, new_supplier)
+    return db_new_supplier
