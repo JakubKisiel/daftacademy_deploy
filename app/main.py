@@ -9,7 +9,7 @@ from typing import Optional, Dict, Set, Deque, List
 from collections import deque
 from starlette.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from app.views.zad5 import zad5
+from app.views.zad5 import router as zad5
 
 app = FastAPI()
 app.include_router(zad5, tags=["northwind"])
