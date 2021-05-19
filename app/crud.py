@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 
 from . import models
 from .schemas import NewSupplier
+from sqlalchemy import update
 
 def get_all_suppliers(db: Session):
     return db.query(models.Supplier).order_by(models.Supplier.SupplierID).all()
@@ -26,3 +27,11 @@ def create_new_supplier(db: Session, new_supplier: NewSupplier):
     db.add(new_supplier_output)
     db.commit()
     return new_supplier_output
+
+
+def update_supplier(db: Session,supplier_id: int, new_supplier: NewSupplier):
+    supplier_dict={key: val for key, val in new_supplier.dict().items() if val is not None}
+    if bool(supplier_dict):
+        db.execute(update(models.Supplier).where(models.Supplier.SupplierID == supplier_id).values(**supplier_dict))
+        db.commit()
+    return get_supplier(db, supplier_id)
