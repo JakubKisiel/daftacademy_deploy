@@ -32,6 +32,6 @@ def create_new_supplier(db: Session, new_supplier: NewSupplier):
 def update_supplier(db: Session,supplier_id: int, new_supplier: NewSupplier):
     supplier_dict={key: val for key, val in new_supplier.dict().items() if val is not None}
     if bool(supplier_dict):
-        db.execute(update(models.Supplier).where(models.Supplier.SupplierID == supplier_id).values(**supplier_dict))
+        db.execute(models.Supplier.update().where(models.Supplier.SupplierID == supplier_id).values(**supplier_dict))
         db.commit()
     return get_supplier(db, supplier_id)
