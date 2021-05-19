@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 
 from . import models
+from .schemas import NewSupplier
 
 def get_all_suppliers(db: Session):
     return db.query(models.Supplier).order_by(models.Supplier.SupplierID).all()
